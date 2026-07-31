@@ -402,6 +402,42 @@
             </div>
 
             <div class="test-block">
+              <p class="section-label">Percentual de gordura · informativo</p>
+              <div class="field full">
+                <label for="fn-fat-protocol">Protocolo</label>
+                <select id="fn-fat-protocol">
+                  <option value="skinfold">Dobras cutâneas (até 40 mm)</option>
+                  <option value="obese">Protocolo para obesos</option>
+                </select>
+              </div>
+              <div class="form-grid profile-dependent" id="fn-skinfold-fields">
+                <div class="field">
+                  <label for="fn-fold-1" id="fn-fold-1-label">Dobra do tórax</label>
+                  <div class="unit"><input id="fn-fold-1" type="number" min="0.1" max="40" step="0.1" inputmode="decimal"><span>mm</span></div>
+                </div>
+                <div class="field">
+                  <label for="fn-fold-2" id="fn-fold-2-label">Dobra abdominal</label>
+                  <div class="unit"><input id="fn-fold-2" type="number" min="0.1" max="40" step="0.1" inputmode="decimal"><span>mm</span></div>
+                </div>
+                <div class="field full">
+                  <label for="fn-fold-3">Dobra da coxa</label>
+                  <div class="unit"><input id="fn-fold-3" type="number" min="0.1" max="40" step="0.1" inputmode="decimal"><span>mm</span></div>
+                </div>
+              </div>
+              <div class="form-grid profile-dependent hidden" id="fn-obese-fat-fields">
+                <div class="field">
+                  <label for="fn-abdomen-1">Perímetro abdominal 1</label>
+                  <div class="unit"><input id="fn-abdomen-1" type="number" min="30" max="300" step="0.1" inputmode="decimal"><span>cm</span></div>
+                </div>
+                <div class="field">
+                  <label for="fn-abdomen-2">Perímetro abdominal 2</label>
+                  <div class="unit"><input id="fn-abdomen-2" type="number" min="30" max="300" step="0.1" inputmode="decimal"><span>cm</span></div>
+                </div>
+              </div>
+              <p class="hint" id="fn-fat-hint">Informe as três dobras indicadas, cada uma com até 40 mm.</p>
+            </div>
+
+            <div class="test-block">
               <p class="section-label">Modalidade aquática</p>
               <div class="field full">
                 <label for="fn-water-type">Tipo de prova</label>
@@ -491,7 +527,7 @@
     </div>
 
     <aside class="notice">
-      <strong>Escopo e interpretação.</strong> Para Outros Corpos e Quadros, foram usados o Anexo P, a Equação 9 e a Tabela 6-3. Para Fuzileiros Navais, foram usadas as tabelas do inciso 5.5.2 e as Tabelas 6-1 e 6-2 da CGCFN-108, Revisão 2. Desempenho abaixo de 50 em qualquer prova implica em reprovação; para FN, a avaliação corporal deve atingir 70 pontos. O percentual de gordura não foi incluído porque o PDF fornecido não contém a tabela classificatória mencionada no texto. Para não deixar a idade de 50 anos sem enquadramento, o simulador a inclui na última faixa, grafada como “&gt;50” no PDF.
+      <strong>Escopo e interpretação.</strong> Para Outros Corpos e Quadros, foram usados o Anexo P, a Equação 9 e a Tabela 6-3. Para Fuzileiros Navais, foram usadas as tabelas do inciso 5.5.2, as Equações 4 a 8, as Tabelas 6-1 e 6-2 e o Anexo I da CGCFN-108, Revisão 2. Desempenho abaixo de 50 em qualquer prova implica em reprovação; para FN, a avaliação corporal deve atingir 70 pontos. O percentual de gordura é exclusivamente informativo. Para mulheres obesas, o resultado principal usa 0,14354 × massa; a variante 10,8336 × massa é exibida separadamente como provável erro da publicação. As lacunas do Anexo I são indicadas como “entre faixas”; nas sobreposições é adotada a classificação mais conservadora. Para não deixar a idade de 50 anos sem enquadramento, o simulador a inclui na última faixa, grafada como “&gt;50” no PDF.
     </aside>
   </main>
 
@@ -731,6 +767,26 @@
       plank: { label: "Prancha isométrica", direction: "higher", kind: "time" }
     };
 
+    const FAT_LEVELS = ["Excelente", "Bom", "Acima da média", "Média", "Abaixo da média", "Ruim", "Muito ruim"];
+    const FAT_TABLE = {
+      M: [
+        [18, 25, [[4,6],[8,10],[12,13],[14,16],[17,20],[20,24],[26,36]]],
+        [26, 35, [[8,11],[12,15],[16,18],[18,20],[22,24],[24,27],[28,36]]],
+        [36, 45, [[10,14],[16,18],[19,21],[21,23],[24,25],[27,29],[30,39]]],
+        [46, 55, [[12,16],[18,20],[21,23],[24,25],[26,27],[28,30],[32,38]]],
+        [56, 65, [[13,18],[20,21],[22,23],[24,25],[26,27],[28,30],[32,38]]],
+        [66, 999, [[14,18],[19,21],[22,23],[23,24],[25,26],[27,29],[31,38]]]
+      ],
+      F: [
+        [18, 25, [[13,16],[17,19],[20,22],[23,25],[26,28],[29,31],[33,43]]],
+        [26, 35, [[14,16],[18,20],[21,23],[24,25],[27,29],[31,33],[36,49]]],
+        [36, 45, [[16,19],[20,23],[24,26],[27,29],[30,32],[33,36],[38,48]]],
+        [46, 55, [[17,21],[23,25],[26,28],[29,31],[32,34],[35,38],[39,50]]],
+        [56, 65, [[18,22],[24,26],[27,29],[30,32],[33,35],[36,38],[39,49]]],
+        [66, 999, [[16,20],[22,26],[27,29],[30,32],[32,34],[35,37],[38,41]]]
+      ]
+    };
+
     const $ = id => document.getElementById(id);
     const form = $("taf-form");
     const swimType = $("swim-type");
@@ -839,6 +895,40 @@
       return { heightCm, weightKg, waistCm, waist, bmiRaw, bmi, classification, category, bmiPoints, waistPoints, waistApplicable, finalPoints, sufficient: finalPoints >= 70 };
     }
 
+    function classifyFat(sex, age, percentage) {
+      const rounded = Math.round(percentage);
+      const minimum = sex === "M" ? 3 : 13;
+      if (percentage < minimum) return { level: "Abaixo do recomendado", rounded };
+      const row = FAT_TABLE[sex].find(item => age >= item[0] && age <= item[1]);
+      for (let i = FAT_LEVELS.length - 1; i >= 0; i--) {
+        const [min, max] = row[2][i];
+        if (rounded >= min && rounded <= max) return { level: FAT_LEVELS[i], rounded };
+      }
+      const maximum = row[2][row[2].length - 1][1];
+      return { level: rounded > maximum ? "Acima das faixas tabeladas" : "Entre faixas tabeladas", rounded };
+    }
+
+    function calculateFnFat(sex, age, heightCm, weightKg) {
+      const obese = $("fn-fat-protocol").value === "obese";
+      let percentage, density = null, sum = null, abdominalAverage = null, publicationPercentage = null;
+      if (!obese) {
+        sum = Number($("fn-fold-1").value) + Number($("fn-fold-2").value) + Number($("fn-fold-3").value);
+        density = sex === "M"
+          ? 1.109380 - 0.0008267 * sum + 0.0000016 * (sum ** 2) - 0.0002574 * age
+          : 1.0994921 - 0.0009929 * sum + 0.0000023 * (sum ** 2) - 0.0001392 * age;
+        percentage = ((4.95 / density) - 4.50) * 100;
+      } else {
+        abdominalAverage = (Number($("fn-abdomen-1").value) + Number($("fn-abdomen-2").value)) / 2;
+        if (sex === "M") {
+          percentage = 0.31457 * abdominalAverage - 0.10969 * weightKg + 10.8336;
+        } else {
+          percentage = 0.11077 * abdominalAverage - 0.17666 * heightCm + 0.14354 * weightKg + 51.03301;
+          publicationPercentage = 0.11077 * abdominalAverage - 0.17666 * heightCm + 10.8336 * weightKg + 51.03301;
+        }
+      }
+      return { obese, percentage, publicationPercentage, density, sum, abdominalAverage, classification: classifyFat(sex, age, percentage) };
+    }
+
     function rangeLabel(row) {
       const min = Number(row[0]), max = Number(row[1]);
       return max === 999 ? "50 anos ou mais (PDF: >50)" : `${min} a ${max} anos`;
@@ -937,6 +1027,27 @@
       </article>`;
     }
 
+    function fatResultClass(level) {
+      if (level === "Excelente" || level === "Bom" || level === "Acima da média") return "good";
+      if (level === "Média" || level === "Abaixo da média" || level === "Entre faixas tabeladas") return "warn";
+      return "bad";
+    }
+
+    function fnFatResultCard(fat) {
+      const method = fat.obese
+        ? `Protocolo para obesos · média abdominal ${fat.abdominalAverage.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} cm`
+        : `Dobras cutâneas · soma ${fat.sum.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} mm · densidade ${fat.density.toLocaleString("pt-BR", { minimumFractionDigits: 4, maximumFractionDigits: 4 })}`;
+      const publicationAlert = fat.publicationPercentage === null ? "" : `<p class="source-alert"><strong>Comparação da Equação 8:</strong> versão tecnicamente consistente (0,14354 × massa): ${fat.percentage.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%. Versão informada como publicada (10,8336 × massa): ${fat.publicationPercentage.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}% — provável erro de coeficiente e não usada na classificação.</p>`;
+      return `<article class="result-card">
+        <div class="result-top">
+          <div><h3 class="result-name">Percentual de gordura · informativo</h3><p class="result-meta">${method}</p></div>
+          <div class="score ${fatResultClass(fat.classification.level)}">${fat.percentage.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%</div>
+        </div>
+        <p class="target">Classificação: <strong>${fat.classification.level}</strong> (percentual arredondado: ${fat.classification.rounded}%). Não altera o resultado geral.</p>
+        ${publicationAlert}
+      </article>`;
+    }
+
     function referenceTable(result) {
       const cells = result.row.slice(2).map((value, i) => `<td>${value}</td>`).join("");
       return `<table aria-label="Índices de ${TESTS[result.test].label}">
@@ -977,6 +1088,15 @@
           <tr><td>Perímetro da cintura</td><td>${body.waist} cm</td><td>${body.waistPoints > 0 ? "+" : ""}${body.waistPoints}</td></tr>
           <tr><td>Nota final (máximo 100)</td><td colspan="2"><strong>${body.finalPoints} · ${body.sufficient ? "Suficiente" : "Insuficiente"}</strong></td></tr>
         </tbody>
+      </table>`;
+    }
+
+    function fnFatReferenceTable(sex, age, fat) {
+      const row = FAT_TABLE[sex].find(item => age >= item[0] && age <= item[1]);
+      const cells = row[2].map((range, i) => `<tr><td>${FAT_LEVELS[i]}</td><td>${range[0]}% a ${range[1]}%</td></tr>`).join("");
+      return `<table aria-label="Classificação do percentual de gordura">
+        <thead><tr><th>Percentual de gordura · ${row[1] === 999 ? "acima de 65 anos" : `${row[0]} a ${row[1]} anos`}</th><th>Faixa</th></tr></thead>
+        <tbody>${cells}</tbody>
       </table>`;
     }
 
@@ -1036,6 +1156,21 @@
         : "A flexão no solo substitui a barra apenas por motivo de saúde.";
     }
 
+    function updateFnFat() {
+      const marine = corps.value === "marine";
+      const obese = $("fn-fat-protocol").value === "obese";
+      const female = $("sex").value === "F";
+      $("fn-skinfold-fields").classList.toggle("hidden", obese);
+      $("fn-obese-fat-fields").classList.toggle("hidden", !obese);
+      $("fn-fold-1-label").textContent = female ? "Dobra do tríceps" : "Dobra do tórax";
+      $("fn-fold-2-label").textContent = female ? "Dobra da crista ilíaca" : "Dobra abdominal";
+      for (const id of ["fn-fold-1", "fn-fold-2", "fn-fold-3"]) $(id).required = marine && !obese;
+      for (const id of ["fn-abdomen-1", "fn-abdomen-2"]) $(id).required = marine && obese;
+      $("fn-fat-hint").textContent = obese
+        ? "Informe os dois perímetros abdominais; o cálculo utiliza a média das medidas."
+        : "Informe as três dobras indicadas, cada uma com até 40 mm.";
+    }
+
     function updateBodyRule() {
       const evaluative = Number($("year").value) >= 2031;
       $("body-rule-hint").textContent = evaluative
@@ -1067,12 +1202,14 @@
       }
       updateSwim();
       updateFnStrength();
+      updateFnFat();
     }
 
     swimType.addEventListener("change", updateSwim);
     $("fn-water-type").addEventListener("change", updateFnWater);
     $("fn-strength-type").addEventListener("change", updateFnStrength);
-    $("sex").addEventListener("change", updateFnStrength);
+    $("fn-fat-protocol").addEventListener("change", updateFnFat);
+    $("sex").addEventListener("change", () => { updateFnStrength(); updateFnFat(); });
     $("year").addEventListener("change", updateBodyRule);
     corps.addEventListener("change", updateCorps);
 
@@ -1095,14 +1232,15 @@
           scoreFnTest("plank", sex, age, enteredTime("fn-plank"))
         ];
         const body = calculateFnBody(sex, height, weight, waist);
+        const fat = calculateFnFat(sex, age, height, weight);
         const physicalApproved = results.every(r => r.score !== null);
         const approved = physicalApproved && body.sufficient;
         $("profile-summary").textContent = `Fuzileiro Naval · ${sex === "M" ? "Masculino" : "Feminino"} · ${age} anos · ${year}`;
         $("status-value").textContent = approved ? "Aprovado" : "Reprovado";
         $("overall-status").classList.toggle("approved", approved);
         $("overall-status").classList.toggle("failed", !approved);
-        $("result-list").innerHTML = results.map(fnResultCard).join("") + fnBodyResultCard(body);
-        $("reference-tables").innerHTML = results.map(fnReferenceTable).join("") + fnBodyReferenceTable(body);
+        $("result-list").innerHTML = results.map(fnResultCard).join("") + fnBodyResultCard(body) + fnFatResultCard(fat);
+        $("reference-tables").innerHTML = results.map(fnReferenceTable).join("") + fnBodyReferenceTable(body) + fnFatReferenceTable(sex, age, fat);
         $("result-subtitle").textContent = !physicalApproved
           ? "Reprovado: há pelo menos uma prova com nota abaixo de 50 pontos."
           : !body.sufficient
@@ -1155,6 +1293,7 @@
         updateSwim();
         updateFnWater();
         updateFnStrength();
+        updateFnFat();
         updateBodyRule();
         updateCorps();
         $("empty-state").classList.remove("hidden");
@@ -1166,6 +1305,7 @@
     updateSwim();
     updateFnWater();
     updateFnStrength();
+    updateFnFat();
     updateBodyRule();
     updateCorps();
   </script>

@@ -854,14 +854,7 @@
             </div>
 
             <div class="test-block">
-              <p class="section-label">Modalidade aquática</p>
-              <div class="field full">
-                <label for="fn-water-type">Tipo de prova</label>
-                <select id="fn-water-type">
-                  <option value="fn-swim">Natação de 100 m</option>
-                  <option value="fn-water-stay">Permanência na água</option>
-                </select>
-              </div>
+              <p class="section-label">Natação de 100 m</p>
               <div class="time-row" data-time="fn-water">
                 <div class="unit"><label for="fn-water-min">Minutos</label><input id="fn-water-min" type="number"
                     min="0" max="59" step="1" placeholder="02" inputmode="numeric"><span>min</span></div>
@@ -869,7 +862,7 @@
                 <div class="unit"><label for="fn-water-sec">Segundos</label><input id="fn-water-sec" type="number"
                     min="0" max="59" step="1" placeholder="40" inputmode="numeric"><span>s</span></div>
               </div>
-              <p class="hint" id="fn-water-hint">Quanto menor o tempo nos 100 m, maior a pontuação.</p>
+              <p class="hint">Quanto menor o tempo nos 100 m, maior a pontuação.</p>
             </div>
 
             <div class="test-block">
@@ -1202,7 +1195,6 @@
 
     const FN_TESTS = {
       swim: { label: "Natação de 100 m", direction: "lower", kind: "time" },
-      waterStay: { label: "Permanência na água", direction: "higher", kind: "time" },
       run: { label: "Corrida de 3.200 m", direction: "lower", kind: "time" },
       bar: { label: "Flexão na barra", direction: "higher", kind: "reps" },
       pushup: { label: "Flexão de braços no solo", direction: "higher", kind: "reps" },
@@ -1284,10 +1276,6 @@
     }
 
     function scoreFnTest(test, sex, age, performance) {
-      if (test === "waterStay") {
-        const score = performance >= 600 ? 50 : null;
-        return { test, score, performance, thresholds: [600], row: [18, 999, "10:00"], next: null };
-      }
       const spec = FN_TESTS[test];
       const row = fnAgeRow(test, sex, age);
       const thresholds = row.slice(2).map(value => spec.kind === "time" ? seconds(value) : Number(value));
@@ -1439,9 +1427,7 @@
       const valueText = spec.kind === "time" ? displayTime(result.performance) : `${result.performance} repetições`;
       const scoreText = result.score === null ? "&lt; 50" : result.score;
       let target;
-      if (result.test === "waterStay") {
-        target = result.score === null ? "Para 50 pontos: permanecer por pelo menos 10:00." : "Índice único de 50 pontos atingido.";
-      } else if (!result.next) {
+      if (!result.next) {
         target = "Pontuação máxima da tabela atingida.";
       } else {
         const nextValue = spec.kind === "time" ? displayTime(result.next.value) : `${result.next.value} repetições`;
@@ -1450,7 +1436,7 @@
       }
       return `<article class="result-card">
         <div class="result-top">
-          <div><h3 class="result-name">${spec.label}</h3><p class="result-meta">Resultado informado: ${valueText}${result.test === "waterStay" ? "" : ` · ${rangeLabel(result.row)}`}</p></div>
+          <div><h3 class="result-name">${spec.label}</h3><p class="result-meta">Resultado informado: ${valueText} · ${rangeLabel(result.row)}</p></div>
           <div class="score ${scoreClass(result.score)}">${scoreText}</div>
         </div>
         <p class="target">${target}</p>
@@ -1513,9 +1499,6 @@
     }
 
     function fnReferenceTable(result) {
-      if (result.test === "waterStay") {
-        return `<table aria-label="Índice de permanência na água"><thead><tr><th>Permanência na água</th><th>50 pontos</th></tr></thead><tbody><tr><td>Todas as faixas</td><td>10:00</td></tr></tbody></table>`;
-      }
       const spec = FN_TESTS[result.test];
       const cells = result.row.slice(2).map(value => `<td>${value}</td>`).join("");
       return `<table aria-label="Índices de ${spec.label}">
@@ -1583,13 +1566,6 @@
       $("swim-label").textContent = swimType.value === "swim450" ? "Natação de 450 m" : "Natação de 50 m";
     }
 
-    function updateFnWater() {
-      const staying = $("fn-water-type").value === "fn-water-stay";
-      $("fn-water-hint").textContent = staying
-        ? "São atribuídos 50 pontos para permanência de pelo menos 10 minutos."
-        : "Quanto menor o tempo nos 100 m, maior a pontuação.";
-    }
-
     function updateFnStrength() {
       const female = $("sex").value === "F";
       $("fn-strength-choice-field").classList.toggle("hidden", female);
@@ -1632,7 +1608,7 @@
       $("fn-fields").classList.toggle("hidden", !marine);
       for (const id of ["year", "sex", "age"]) $(id).required = selected;
       for (const id of ["swim-type", "height", "waist", "run-min", "run-sec", "plank-min", "plank-sec"]) $(id).required = other;
-      for (const id of ["fn-height", "fn-weight", "fn-waist", "fn-water-type", "fn-water-min", "fn-water-sec", "fn-run-min", "fn-run-sec", "fn-strength-reps", "fn-plank-min", "fn-plank-sec"]) $(id).required = marine;
+      for (const id of ["fn-height", "fn-weight", "fn-waist", "fn-water-min", "fn-water-sec", "fn-run-min", "fn-run-sec", "fn-strength-reps", "fn-plank-min", "fn-plank-sec"]) $(id).required = marine;
       $("swim-min").required = other && swimType.value !== "none";
       $("swim-sec").required = other && swimType.value !== "none";
       if (marine) {
@@ -1650,7 +1626,6 @@
     }
 
     swimType.addEventListener("change", updateSwim);
-    $("fn-water-type").addEventListener("change", updateFnWater);
     $("fn-strength-type").addEventListener("change", updateFnStrength);
     $("fn-fat-protocol").addEventListener("change", updateFnFat);
     $("sex").addEventListener("change", () => { updateFnStrength(); updateFnFat(); });
@@ -1667,10 +1642,9 @@
         const height = Number($("fn-height").value);
         const weight = Number($("fn-weight").value);
         const waist = Number($("fn-waist").value);
-        const waterTest = $("fn-water-type").value === "fn-water-stay" ? "waterStay" : "swim";
         const strengthTest = sex === "F" || $("fn-strength-type").value === "fn-pushup" ? "pushup" : "bar";
         const results = [
-          scoreFnTest(waterTest, sex, age, enteredTime("fn-water")),
+          scoreFnTest("swim", sex, age, enteredTime("fn-water")),
           scoreFnTest("run", sex, age, enteredTime("fn-run")),
           scoreFnTest(strengthTest, sex, age, Number($("fn-strength-reps").value)),
           scoreFnTest("plank", sex, age, enteredTime("fn-plank"))
@@ -1735,7 +1709,6 @@
     form.addEventListener("reset", () => {
       setTimeout(() => {
         updateSwim();
-        updateFnWater();
         updateFnStrength();
         updateFnFat();
         updateBodyRule();
@@ -1747,7 +1720,6 @@
     });
 
     updateSwim();
-    updateFnWater();
     updateFnStrength();
     updateFnFat();
     updateBodyRule();

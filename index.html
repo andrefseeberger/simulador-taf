@@ -527,7 +527,18 @@
     }
 
     .notice strong {
+      display: block;
+      margin-bottom: 8px;
       color: #654b14;
+    }
+
+    .notice ul {
+      margin: 0;
+      padding-left: 19px;
+    }
+
+    .notice li + li {
+      margin-top: 6px;
     }
 
     .independence-notice {
@@ -941,15 +952,16 @@
     </div>
 
     <aside class="notice">
-      <strong>Escopo e interpretação.</strong> Para Outros Corpos e Quadros, foram usados o Anexo P, a Equação 9 e a
-      Tabela 6-3. Para Fuzileiros Navais, foram usadas as tabelas do inciso 5.5.2, as Equações 4 a 8, as Tabelas 6-1 e
-      6-2 e o Anexo I da CGCFN-108, Revisão 2. Desempenho abaixo de 50 em qualquer prova implica em reprovação; para FN,
-      nota corporal final igual ou superior a 70 é classificada como “Suficiente”, e nota inferior a 70 como
-      “Insuficiente”. O percentual de gordura é exclusivamente informativo e não compõe essa nota. Para mulheres obesas,
-      o resultado principal usa 0,14354 × massa; a variante 10,8336 × massa é exibida separadamente como provável erro
-      da publicação. As lacunas do Anexo I são indicadas como “entre faixas”; nas sobreposições é adotada a
-      classificação mais conservadora. Para não deixar a idade de 50 anos sem enquadramento, o simulador a inclui na
-      última faixa, grafada como “&gt;50” no PDF.
+      <strong>Escopo e interpretação</strong>
+      <ul>
+        <li><b>Outros Corpos e Quadros:</b> foram usados o Anexo P, a Equação 9 e a Tabela 6-3.</li>
+        <li><b>Fuzileiros Navais:</b> foram usadas as tabelas do inciso 5.5.2, as Equações 4 a 8, as Tabelas 6-1 e 6-2 e o Anexo I da CGCFN-108, Revisão 2.</li>
+        <li><b>Provas físicas:</b> desempenho abaixo de 50 pontos em qualquer prova implica em reprovação.</li>
+        <li><b>Avaliação corporal do FN:</b> nota final igual ou superior a 70 é classificada como “Suficiente”; nota inferior a 70, como “Insuficiente”.</li>
+        <li><b>Percentual de gordura:</b> é exclusivamente informativo e não compõe a nota corporal. Para mulheres obesas, o resultado principal usa 0,14354 × massa; a variante 10,8336 × massa é exibida como provável erro da publicação.</li>
+        <li><b>Anexo I:</b> lacunas são indicadas como “entre faixas”; nas sobreposições, é adotada a classificação mais conservadora.</li>
+        <li><b>Idade de 50 anos:</b> para não deixá-la sem enquadramento, o simulador a inclui na última faixa, grafada como “&gt;50” no PDF.</li>
+      </ul>
     </aside>
 
     <aside class="independence-notice" role="note" aria-label="Aviso de independência e uso">
@@ -1366,7 +1378,7 @@
 
     function scoreClass(score) {
       if (score === null) return "bad";
-      if (score >= 80) return "good";
+      if (score >= 70) return "good";
       return "warn";
     }
 
@@ -1380,8 +1392,10 @@
         const verb = spec.direction === "lower" ? "concluir em" : "sustentar por";
         target = `Para <strong>${result.next.points} pontos</strong>: ${verb} ${displayTime(result.next.time)}.`;
       }
-      const isNonMonotonic = result.thresholds.some((value, i, list) => i > 0 && value > list[i - 1]);
-      const sourceAlert = isNonMonotonic
+      const hasRunSourceAnomaly = result.test === "run"
+        && result.period === "29-30"
+        && Number(result.row[0]) === 50;
+      const sourceAlert = hasRunSourceAnomaly
         ? `<p class="source-alert"><strong>Atenção à fonte:</strong> esta linha do PDF traz um índice não monotônico (80 pontos em 14:31 e 90 pontos em 15:30). Os valores foram mantidos literalmente.</p>`
         : "";
       return `<article class="result-card">

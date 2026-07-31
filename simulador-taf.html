@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>Simulador TAF-a | CGCFN-108 Rev. 2</title>
+  <style>
+    :root {
+      --navy: #092b4c;
+      --navy-2: #124f78;
+      --blue: #1976a8;
+      --sky: #e8f4fa;
+      --gold: #e0a52b;
+      --ink: #172331;
+      --muted: #5c6a78;
+      --line: #d8e0e7;
+      --paper: #ffffff;
+      --bg: #f2f5f7;
+      --good: #18724b;
+      --good-bg: #e7f5ee;
+      --warn: #9a5b00;
+      --warn-bg: #fff4d9;
+      --bad: #a33434;
+      --bad-bg: #fdeaea;
+      --shadow: 0 16px 45px rgba(9, 43, 76, .10);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(25, 118, 168, .13), transparent 28rem),
+        linear-gradient(180deg, #eef5f8 0, var(--bg) 29rem);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    .topbar { height: 7px; background: linear-gradient(90deg, var(--gold), #f4cd69 38%, var(--blue) 38%); }
+
+    header {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 52px 24px 30px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 28px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--blue);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    h1 { margin: 0; color: var(--navy); font-size: clamp(2.1rem, 5vw, 4rem); line-height: .98; letter-spacing: -.045em; }
+    .subtitle { max-width: 690px; margin: 18px 0 0; color: var(--muted); font-size: 1.04rem; }
+
+    .doc-tag {
+      padding: 12px 16px;
+      border: 1px solid rgba(18, 79, 120, .22);
+      border-radius: 999px;
+      color: var(--navy-2);
+      background: rgba(255,255,255,.75);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      white-space: nowrap;
+    }
+
+    main { max-width: 1160px; margin: 0 auto; padding: 0 24px 54px; }
+
+    .layout { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(340px, .95fr); gap: 24px; align-items: start; }
+
+    .panel {
+      overflow: hidden;
+      border: 1px solid rgba(9, 43, 76, .09);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-head { padding: 24px 26px 19px; border-bottom: 1px solid var(--line); }
+    .panel-head h2 { margin: 0; color: var(--navy); font-size: 1.18rem; }
+    .panel-head p { margin: 5px 0 0; color: var(--muted); font-size: .88rem; }
+    form { padding: 24px 26px 27px; }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 14px;
+      color: var(--navy);
+      font-size: .78rem;
+      font-weight: 850;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .section-label::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+    .profile-dependent { margin-top: 15px; }
+    .field { min-width: 0; }
+    .field.full { grid-column: 1 / -1; }
+    label, legend { display: block; margin-bottom: 7px; color: #344353; font-size: .82rem; font-weight: 750; }
+
+    select, input {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid #becbd5;
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--ink);
+      background: #fff;
+      font: inherit;
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .16s, box-shadow .16s;
+    }
+    select:focus, input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(25,118,168,.13); }
+    input:invalid:not(:placeholder-shown) { border-color: var(--bad); }
+
+    .test-block { margin-top: 25px; }
+    .time-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 9px; align-items: end; }
+    .time-separator { padding-bottom: 11px; color: var(--muted); font-weight: 900; }
+    .unit { position: relative; }
+    .unit input { padding-right: 40px; }
+    .unit span { position: absolute; right: 12px; bottom: 12px; color: var(--muted); font-size: .78rem; pointer-events: none; }
+    .hint { margin: 8px 0 0; color: var(--muted); font-size: .76rem; }
+    .branch-note {
+      margin-top: 18px;
+      padding: 16px 17px;
+      border: 1px solid #ecd69b;
+      border-radius: 12px;
+      color: #72520d;
+      background: #fff8e6;
+      font-size: .82rem;
+    }
+    .body-formula {
+      margin: 12px 0 0;
+      padding: 10px 12px;
+      border-radius: 9px;
+      color: var(--navy-2);
+      background: var(--sky);
+      font-size: .78rem;
+      font-weight: 750;
+      text-align: center;
+    }
+
+    .actions { display: flex; gap: 11px; margin-top: 27px; }
+    button {
+      min-height: 48px;
+      border: 0;
+      border-radius: 11px;
+      padding: 11px 18px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .12s, box-shadow .12s, background .12s;
+    }
+    button:hover { transform: translateY(-1px); }
+    .primary { flex: 1; color: #fff; background: linear-gradient(135deg, var(--navy-2), var(--blue)); box-shadow: 0 8px 18px rgba(18,79,120,.23); }
+    .secondary { color: var(--navy-2); background: var(--sky); }
+
+    .results { position: sticky; top: 20px; }
+    .results-body { padding: 24px 26px 27px; }
+    .empty {
+      min-height: 270px;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+      border: 1px dashed #b8c8d3;
+      border-radius: 14px;
+      color: var(--muted);
+      background: #f8fafb;
+      text-align: center;
+    }
+    .empty-icon { display: block; margin: 0 auto 13px; color: var(--blue); font-size: 2.1rem; }
+    .summary {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 17px;
+      padding: 17px 18px;
+      border-radius: 14px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--navy), var(--navy-2));
+    }
+    .summary small { display: block; color: rgba(255,255,255,.72); font-size: .72rem; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; }
+    .summary strong { display: block; margin-top: 3px; font-size: 1.02rem; }
+    .overall-status { text-align: right; }
+    .overall-status b { display: block; font-size: 1.45rem; line-height: 1; }
+    .overall-status span { display: block; margin-top: 5px; color: rgba(255,255,255,.7); font-size: .68rem; text-transform: uppercase; }
+    .overall-status b::before { content: ""; display: inline-block; width: .55em; height: .55em; margin-right: .38em; border-radius: 50%; vertical-align: .08em; background: currentColor; }
+    .overall-status.approved b { color: #7ee2af; }
+    .overall-status.failed b { color: #ffaaa5; }
+
+    .result-card { margin-top: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 13px; }
+    .result-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .result-name { margin: 0; color: var(--navy); font-size: .94rem; font-weight: 820; }
+    .result-meta { margin: 3px 0 0; color: var(--muted); font-size: .73rem; }
+    .score { min-width: 70px; padding: 8px 10px; border-radius: 10px; text-align: center; font-weight: 900; }
+    .score.good { color: var(--good); background: var(--good-bg); }
+    .score.warn { color: var(--warn); background: var(--warn-bg); }
+    .score.bad { color: var(--bad); background: var(--bad-bg); }
+    .target { margin: 12px 0 0; padding-top: 10px; border-top: 1px solid #edf0f2; color: var(--muted); font-size: .75rem; }
+    .target strong { color: #425466; }
+    .source-alert { margin: 10px 0 0; padding: 9px 10px; border-radius: 8px; color: #7b5100; background: var(--warn-bg); font-size: .71rem; }
+
+    .reference { margin-top: 24px; }
+    details { border: 1px solid var(--line); border-radius: 13px; background: #fff; }
+    summary { padding: 15px 17px; color: var(--navy); font-size: .85rem; font-weight: 800; cursor: pointer; }
+    .table-wrap { overflow-x: auto; padding: 0 14px 15px; }
+    table { width: 100%; border-collapse: collapse; font-size: .76rem; white-space: nowrap; }
+    th, td { padding: 8px 9px; border-bottom: 1px solid var(--line); text-align: center; }
+    th { color: var(--navy); background: #f0f6f9; }
+    td:first-child, th:first-child { text-align: left; font-weight: 750; }
+    tr:last-child td { border-bottom: 0; }
+
+    .notice {
+      margin-top: 24px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--gold);
+      border-radius: 4px 12px 12px 4px;
+      color: #536170;
+      background: #fffaf0;
+      font-size: .78rem;
+    }
+    .notice strong { color: #654b14; }
+    footer { max-width: 1160px; margin: 0 auto; padding: 0 24px 34px; color: #73808c; font-size: .73rem; text-align: center; }
+    .hidden { display: none !important; }
+
+    @media (max-width: 820px) {
+      header { grid-template-columns: 1fr; padding-top: 38px; }
+      .doc-tag { width: fit-content; }
+      .layout { grid-template-columns: 1fr; }
+      .results { position: static; }
+    }
+    @media (max-width: 520px) {
+      header, main { padding-left: 15px; padding-right: 15px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .panel-head, form, .results-body { padding-left: 18px; padding-right: 18px; }
+      .actions { flex-direction: column; }
+      .summary { grid-template-columns: 1fr; }
+      .overall-status { text-align: left; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .topbar, form, .notice, footer { display: none; }
+      header { padding: 18px 0; }
+      main { padding: 0; }
+      .layout { display: block; }
+      .panel { box-shadow: none; margin-bottom: 18px; }
+      .results { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar"></div>
+  <header>
+    <div>
+      <p class="eyebrow">Avaliação física · Marinha do Brasil</p>
+      <h1>Simulador TAF-a</h1>
+      <p class="subtitle">Converta os tempos das provas em notas e avalie a relação cintura-estatura conforme o ano da avaliação.</p>
+    </div>
+    <div class="doc-tag">CGCFN-108 · REV. 2</div>
+  </header>
+
+  <main>
+    <div class="layout">
+      <section class="panel" aria-labelledby="dados-title">
+        <div class="panel-head">
+          <h2 id="dados-title">Dados da avaliação</h2>
+          <p>Preencha o perfil e os tempos obtidos pelo militar.</p>
+        </div>
+        <form id="taf-form" novalidate>
+          <p class="section-label">Perfil</p>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="corps">Corpo ou quadro</label>
+              <select id="corps" required>
+                <option value="" selected disabled>Selecione o corpo ou quadro</option>
+                <option value="marine">Fuzileiro Naval</option>
+                <option value="other">Outros Corpos e Quadros</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid profile-dependent hidden" id="dependent-profile">
+            <div class="field">
+              <label for="year">Ano da avaliação</label>
+              <select id="year" required>
+                <option value="2027">2027</option>
+                <option value="2028">2028</option>
+                <option value="2029">2029</option>
+                <option value="2030">2030</option>
+                <option value="2031">2031</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="sex">Sexo</label>
+              <select id="sex" required>
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="age">Idade na data do teste</label>
+              <input id="age" type="number" min="18" max="100" step="1" placeholder="Ex.: 32" inputmode="numeric" required>
+            </div>
+            <div class="field">
+              <label for="swim-type">Prova de natação</label>
+              <select id="swim-type">
+                <option value="swim50">50 metros</option>
+                <option value="swim450">450 metros (caso aplicável)</option>
+                <option value="none">Não incluir</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="fn-pending" class="branch-note hidden">
+            Os índices das provas e da avaliação corporal de Fuzileiros Navais serão incluídos na próxima etapa. Nenhum resultado é calculado com as tabelas de Outros Corpos e Quadros.
+          </div>
+
+          <div id="supported-fields">
+          <div class="test-block" id="body-block">
+            <p class="section-label">Avaliação corporal</p>
+            <div class="form-grid">
+              <div class="field">
+                <label for="height">Estatura</label>
+                <div class="unit"><input id="height" type="number" min="100" max="250" step="0.1" placeholder="Ex.: 175" inputmode="decimal" required><span>cm</span></div>
+              </div>
+              <div class="field">
+                <label for="waist">Circunferência da cintura</label>
+                <div class="unit"><input id="waist" type="number" min="30" max="300" step="0.1" placeholder="Ex.: 84" inputmode="decimal" required><span>cm</span></div>
+              </div>
+            </div>
+            <div class="body-formula">RCE = circunferência da cintura ÷ estatura</div>
+            <p class="hint" id="body-rule-hint"></p>
+          </div>
+
+          <div class="test-block">
+            <p class="section-label">Corrida de 2.400 m</p>
+            <div class="time-row" data-time="run">
+              <div class="unit"><label for="run-min">Minutos</label><input id="run-min" type="number" min="0" max="59" step="1" placeholder="12" inputmode="numeric" required><span>min</span></div>
+              <div class="time-separator">:</div>
+              <div class="unit"><label for="run-sec">Segundos</label><input id="run-sec" type="number" min="0" max="59" step="1" placeholder="30" inputmode="numeric" required><span>s</span></div>
+            </div>
+            <p class="hint">Quanto menor o tempo, maior a pontuação.</p>
+          </div>
+
+          <div class="test-block" id="swim-block">
+            <p class="section-label" id="swim-label">Natação de 50 m</p>
+            <div class="time-row" data-time="swim">
+              <div class="unit"><label for="swim-min">Minutos</label><input id="swim-min" type="number" min="0" max="59" step="1" placeholder="01" inputmode="numeric" required><span>min</span></div>
+              <div class="time-separator">:</div>
+              <div class="unit"><label for="swim-sec">Segundos</label><input id="swim-sec" type="number" min="0" max="59" step="1" placeholder="10" inputmode="numeric" required><span>s</span></div>
+            </div>
+            <p class="hint">A prova de 450 m é indicada no documento como “caso aplicável”.</p>
+          </div>
+
+          <div class="test-block">
+            <p class="section-label">Prancha isométrica</p>
+            <div class="time-row" data-time="plank">
+              <div class="unit"><label for="plank-min">Minutos</label><input id="plank-min" type="number" min="0" max="59" step="1" placeholder="01" inputmode="numeric" required><span>min</span></div>
+              <div class="time-separator">:</div>
+              <div class="unit"><label for="plank-sec">Segundos</label><input id="plank-sec" type="number" min="0" max="59" step="1" placeholder="45" inputmode="numeric" required><span>s</span></div>
+            </div>
+            <p class="hint">Quanto maior o tempo sustentado, maior a pontuação.</p>
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="primary">Calcular resultado</button>
+            <button type="reset" class="secondary">Limpar</button>
+          </div>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel results" aria-labelledby="result-title" aria-live="polite">
+        <div class="panel-head">
+          <h2 id="result-title">Resultado da simulação</h2>
+          <p id="result-subtitle">Notas das provas e classificação da avaliação corporal.</p>
+        </div>
+        <div class="results-body" id="results-body">
+          <div class="empty" id="empty-state">
+            <div><span class="empty-icon" aria-hidden="true">◎</span>Informe os dados e clique em <strong>Calcular resultado</strong>.</div>
+          </div>
+          <div id="calculated" class="hidden">
+            <div class="summary">
+              <div><small>Perfil selecionado</small><strong id="profile-summary"></strong></div>
+              <div class="overall-status" id="overall-status"><b id="status-value">—</b><span>Resultado geral</span></div>
+            </div>
+            <div id="result-list"></div>
+            <div class="reference">
+              <details>
+                <summary>Ver índices usados neste cálculo</summary>
+                <div class="table-wrap" id="reference-tables"></div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="notice">
+      <strong>Escopo e interpretação.</strong> Índices das provas transcritos do Anexo P e RCE baseada na Equação 9 e na Tabela 6-3 da CGCFN-108, Revisão 2. Para Outros Corpos e Quadros, a RCE é informativa até 2030 e passa a compor o resultado em 2031. Desempenho abaixo de 50 em qualquer prova ou RCE insatisfatória a partir de 2031 implica em reprovação. Os índices de Fuzileiros Navais ainda não estão incluídos. Para não deixar a idade de 50 anos sem enquadramento, o simulador a inclui na última faixa, grafada como “&gt;50” no PDF.
+    </aside>
+  </main>
+
+  <footer>Simulador local e autocontido · Consulte sempre a norma vigente e a autoridade responsável pela avaliação.</footer>
+
+  <script>
+    "use strict";
+
+    const POINTS = [50, 60, 70, 80, 90, 100];
+    const raw = (strings) => strings[0].trim().split(/\n/).map(line => line.trim().split(/\s+/));
+
+    // Cada linha contém: idade mínima, idade máxima e limites de 50 a 100 pontos.
+    // O limite máximo 999 representa a faixa “acima de 50 anos”.
+    const DATA = {
+      run: {
+        M: {
+          "27-28": raw`18 25 14:12 13:14 12:07 11:09 10:07 09:26
+                       26 33 14:48 13:49 12:37 11:39 10:34 09:54
+                       34 39 15:26 14:27 13:22 12:23 11:33 10:45
+                       40 45 16:21 15:29 14:16 12:59 12:21 11:33
+                       46 49 17:24 16:10 15:22 14:34 13:58 13:09
+                       50 999 18:39 17:22 16:40 15:58 15:33 14:44`,
+          "29-30": raw`18 25 13:48 12:52 11:54 10:59 10:02 09:14
+                       26 33 14:32 13:34 12:32 11:35 10:31 09:46
+                       34 39 15:21 14:23 13:21 12:21 11:30 10:41
+                       40 45 16:17 15:21 14:13 12:57 12:17 11:29
+                       46 49 17:18 16:09 15:21 14:31 13:56 13:07
+                       50 999 18:28 17:21 16:39 14:31 15:30 14:39`,
+          "31": raw`18 25 13:30 12:37 11:44 10:51 09:58 09:05
+                    26 33 14:20 13:24 12:28 11:32 10:30 09:40
+                    34 39 15:18 14:20 13:20 12:21 11:28 10:38
+                    40 45 16:15 15:15 14:12 12:57 12:15 11:26
+                    46 49 17:13 16:08 15:20 14:30 13:55 13:05
+                    50 999 18:20 17:20 16:38 15:54 15:28 14:36`
+        },
+        F: {
+          "27": raw`18 25 15:40 15:00 14:06 13:12 11:48 11:12
+                    26 33 16:16 15:30 14:36 13:42 12:48 12:00
+                    34 39 16:40 16:18 15:36 14:30 13:36 12:48
+                    40 45 17:52 17:18 16:18 15:24 14:36 13:36
+                    46 49 18:58 18:18 17:18 16:24 15:24 14:24
+                    50 999 20:04 19:30 18:36 17:30 17:00 16:00`,
+          "28-30": raw`18 25 15:35 14:48 13:54 13:00 11:51 11:06
+                       26 33 16:16 15:28 14:35 13:42 12:50 12:00
+                       34 39 16:40 16:06 15:22 14:26 13:35 12:48
+                       40 45 17:52 17:10 16:14 15:21 14:32 13:36
+                       46 49 18:52 18:04 17:06 16:12 15:14 14:16
+                       50 999 20:04 19:22 18:31 17:34 16:54 16:00`,
+          "31": raw`18 25 15:30 14:36 13:42 12:48 11:54 11:00
+                    26 33 16:16 15:25 14:34 13:42 12:51 12:00
+                    34 39 16:40 15:54 15:07 14:21 13:34 12:48
+                    40 45 17:52 17:01 16:10 15:18 14:27 13:36
+                    46 49 18:45 17:50 16:55 15:59 15:04 14:09
+                    50 999 20:04 19:15 18:26 17:38 16:49 16:00`
+        }
+      },
+      swim450: {
+        M: {
+          "27-28": raw`18 30 13:53 12:42 11:32 10:21 09:11 08:00
+                       31 40 14:18 13:09 12:00 10:50 09:41 08:32
+                       41 49 14:39 13:31 12:23 11:14 10:06 08:58
+                       50 999 14:49 13:42 12:34 11:27 10:19 09:12`,
+          "29-30": raw`18 30 13:29 12:20 11:12 10:03 08:55 07:46
+                       31 40 13:53 12:46 11:39 10:31 09:24 08:17
+                       41 49 14:13 13:07 12:01 10:54 09:48 08:42
+                       50 999 14:23 13:18 12:12 11:07 10:01 08:56`,
+          "31": raw`18 30 12:58 11:52 10:46 09:40 08:34 07:28
+                    31 40 13:21 12:16 11:12 10:07 09:03 07:58
+                    41 49 13:40 12:36 11:33 10:29 09:26 08:22
+                    50 999 13:50 12:47 11:44 10:41 09:38 08:35`
+        },
+        F: {
+          "27-28": raw`18 30 15:37 14:23 13:09 11:56 10:42 09:28
+                       31 40 16:07 14:54 13:42 12:29 11:16 10:04
+                       41 49 16:32 15:20 14:09 12:57 11:45 10:33
+                       50 999 16:58 15:47 14:37 13:25 12:14 11:04`,
+          "29-30": raw`18 30 15:10 13:58 12:46 11:35 10:23 09:11
+                       31 40 15:39 14:28 13:18 12:07 10:56 09:46
+                       41 49 16:03 14:53 13:44 12:34 11:24 10:15
+                       50 999 16:28 15:19 14:11 13:02 11:53 10:45`,
+          "31": raw`18 30 14:35 13:26 12:17 11:08 09:59 08:50
+                    31 40 15:03 13:55 12:47 11:39 10:31 09:23
+                    41 49 15:26 14:19 13:12 12:05 10:58 09:51
+                    50 999 15:50 14:44 13:38 12:32 11:26 10:20`
+        }
+      },
+      swim50: {
+        M: {
+          "27-28": raw`18 30 01:30 01:20 01:10 01:00 00:50 00:40
+                       31 40 01:35 01:25 01:15 01:05 00:55 00:45
+                       41 49 01:40 01:30 01:20 01:10 01:00 00:50
+                       50 999 01:45 01:35 01:25 01:15 01:05 00:55`,
+          "29-30": raw`18 30 01:25 01:15 01:05 00:55 00:45 00:35
+                       31 40 01:30 01:20 01:10 01:00 00:50 00:40
+                       41 49 01:35 01:25 01:15 01:05 00:55 00:45
+                       50 999 01:40 01:30 01:20 01:10 01:00 00:50`,
+          "31": raw`18 30 01:20 01:10 01:00 00:50 00:40 00:30
+                    31 40 01:25 01:15 01:05 00:55 00:45 00:35
+                    41 49 01:30 01:20 01:10 01:00 00:50 00:40
+                    50 999 01:35 01:25 01:15 01:05 00:55 00:45`
+        },
+        F: {
+          "27-28": raw`18 30 02:20 02:10 02:00 01:50 01:40 01:30
+                       31 40 02:25 02:15 02:05 01:55 01:45 01:35
+                       41 49 02:30 02:20 02:10 02:00 01:50 01:40
+                       50 999 02:35 02:25 02:15 02:05 01:55 01:45`,
+          "29-30": raw`18 30 02:10 02:00 01:50 01:40 01:30 01:20
+                       31 40 02:15 02:05 01:55 01:45 01:35 01:25
+                       41 49 02:20 02:10 02:00 01:50 01:40 01:30
+                       50 999 02:25 02:15 02:05 01:55 01:45 01:35`,
+          "31": raw`18 30 02:00 01:50 01:40 01:30 01:20 01:10
+                    31 40 02:05 01:55 01:45 01:35 01:25 01:15
+                    41 49 02:10 02:00 01:50 01:40 01:30 01:20
+                    50 999 02:15 02:05 01:55 01:45 01:35 01:25`
+        }
+      },
+      plank: {
+        M: {
+          "27-28": raw`18 25 01:05 01:26 01:46 02:07 02:27 02:48
+                       26 33 01:00 01:21 01:41 02:01 02:21 02:41
+                       34 39 00:57 01:17 01:36 01:56 02:16 02:35
+                       40 45 00:53 01:12 01:31 01:50 02:10 02:30
+                       46 49 00:50 01:09 01:28 01:47 02:06 02:26
+                       50 999 00:47 01:05 01:24 01:43 02:01 02:20`,
+          "29-30": raw`18 25 01:07 01:29 01:50 02:11 02:32 02:53
+                       26 33 01:02 01:24 01:44 02:05 02:25 02:46
+                       34 39 00:59 01:19 01:39 02:00 02:20 02:40
+                       40 45 00:55 01:14 01:34 01:54 02:14 02:35
+                       46 49 00:52 01:11 01:31 01:50 02:10 02:31
+                       50 999 00:48 01:07 01:27 01:46 02:05 02:24`,
+          "31": raw`18 25 01:10 01:32 01:54 02:16 02:38 03:00
+                    26 33 01:05 01:27 01:48 02:10 02:31 02:53
+                    34 39 01:01 01:22 01:43 02:04 02:25 02:47
+                    40 45 00:57 01:17 01:38 01:58 02:19 02:41
+                    46 49 00:54 01:14 01:34 01:54 02:15 02:37
+                    50 999 00:50 01:10 01:30 01:50 02:10 02:30`
+        },
+        F: {
+          "27-28": raw`18 25 00:56 01:16 01:36 01:56 02:16 02:36
+                       26 33 00:52 01:11 01:30 01:49 02:09 02:30
+                       34 39 00:48 01:06 01:24 01:44 02:02 02:25
+                       40 45 00:45 01:02 01:21 01:38 01:55 02:19
+                       46 49 00:42 00:59 01:16 01:32 01:48 02:15
+                       50 999 00:38 00:58 01:16 01:34 01:52 02:09`,
+          "29-30": raw`18 25 00:58 01:19 01:40 02:01 02:22 02:43
+                       26 33 00:54 01:14 01:34 01:54 02:14 02:36
+                       34 39 00:50 01:09 01:28 01:48 02:07 02:31
+                       40 45 00:47 01:05 01:24 01:42 02:00 02:25
+                       46 49 00:44 01:01 01:19 01:36 01:53 02:21
+                       50 999 00:40 01:00 01:19 01:38 01:57 02:14`,
+          "31": raw`18 25 01:00 01:22 01:44 02:06 02:28 02:50
+                    26 33 00:56 01:17 01:38 01:59 02:20 02:43
+                    34 39 00:52 01:12 01:32 01:52 02:12 02:37
+                    40 45 00:49 01:08 01:27 01:46 02:05 02:31
+                    46 49 00:46 01:04 01:22 01:40 01:58 02:27
+                    50 999 00:42 01:02 01:22 01:42 02:02 02:20`
+        }
+      }
+    };
+
+    const TESTS = {
+      run: { label: "Corrida de 2.400 m", direction: "lower" },
+      swim50: { label: "Natação de 50 m", direction: "lower" },
+      swim450: { label: "Natação de 450 m", direction: "lower" },
+      plank: { label: "Prancha isométrica", direction: "higher" }
+    };
+
+    const $ = id => document.getElementById(id);
+    const form = $("taf-form");
+    const swimType = $("swim-type");
+    const corps = $("corps");
+
+    function periodFor(test, sex, year) {
+      const y = Number(year);
+      if (test === "run" && sex === "F") return y === 2027 ? "27" : y === 2031 ? "31" : "28-30";
+      return y <= 2028 ? "27-28" : y <= 2030 ? "29-30" : "31";
+    }
+
+    function seconds(value) {
+      const [m, s] = value.split(":").map(Number);
+      return m * 60 + s;
+    }
+
+    function enteredTime(prefix) {
+      const m = Number($(prefix + "-min").value);
+      const s = Number($(prefix + "-sec").value);
+      return m * 60 + s;
+    }
+
+    function displayTime(total) {
+      const m = Math.floor(total / 60);
+      const s = total % 60;
+      return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+    }
+
+    function ageRow(test, sex, year, age) {
+      const period = periodFor(test, sex, year);
+      const rows = DATA[test][sex][period];
+      const row = rows.find(r => age >= Number(r[0]) && age <= Number(r[1]));
+      return { row, period };
+    }
+
+    function scoreTest(test, sex, year, age, performance) {
+      const { row, period } = ageRow(test, sex, year, age);
+      const thresholds = row.slice(2).map(seconds);
+      const direction = TESTS[test].direction;
+      let score = null;
+      for (let i = POINTS.length - 1; i >= 0; i--) {
+        const passed = direction === "lower" ? performance <= thresholds[i] : performance >= thresholds[i];
+        if (passed) { score = POINTS[i]; break; }
+      }
+      const nextIndex = score === null ? 0 : POINTS.indexOf(score) + 1;
+      const next = nextIndex < POINTS.length ? { points: POINTS[nextIndex], time: thresholds[nextIndex] } : null;
+      return { test, score, performance, thresholds, row, period, next };
+    }
+
+    function rangeLabel(row) {
+      const min = Number(row[0]), max = Number(row[1]);
+      return max === 999 ? "50 anos ou mais (PDF: >50)" : `${min} a ${max} anos`;
+    }
+
+    function scoreClass(score) {
+      if (score === null) return "bad";
+      if (score >= 80) return "good";
+      return "warn";
+    }
+
+    function resultCard(result) {
+      const spec = TESTS[result.test];
+      const scoreText = result.score === null ? "&lt; 50" : result.score;
+      let target;
+      if (!result.next) {
+        target = "Pontuação máxima da tabela atingida.";
+      } else {
+        const verb = spec.direction === "lower" ? "concluir em" : "sustentar por";
+        target = `Para <strong>${result.next.points} pontos</strong>: ${verb} ${displayTime(result.next.time)}.`;
+      }
+      const isNonMonotonic = result.thresholds.some((value, i, list) => i > 0 && value > list[i - 1]);
+      const sourceAlert = isNonMonotonic
+        ? `<p class="source-alert"><strong>Atenção à fonte:</strong> esta linha do PDF traz um índice não monotônico (80 pontos em 14:31 e 90 pontos em 15:30). Os valores foram mantidos literalmente.</p>`
+        : "";
+      return `<article class="result-card">
+        <div class="result-top">
+          <div><h3 class="result-name">${spec.label}</h3><p class="result-meta">Tempo informado: ${displayTime(result.performance)} · ${rangeLabel(result.row)}</p></div>
+          <div class="score ${scoreClass(result.score)}">${scoreText}</div>
+        </div>
+        <p class="target">${target}</p>
+        ${sourceAlert}
+      </article>`;
+    }
+
+    function classifyRce(value) {
+      if (value < 0.5) return "Ideal";
+      if (value <= 0.55) return "Satisfatório";
+      return "Insatisfatório";
+    }
+
+    function rceClass(classification) {
+      if (classification === "Ideal") return "good";
+      if (classification === "Satisfatório") return "warn";
+      return "bad";
+    }
+
+    function bodyResultCard(body, year) {
+      const evaluative = Number(year) >= 2031;
+      const effect = evaluative
+        ? (body.classification === "Insatisfatório" ? "Resultado avaliativo: implica em reprovação." : "Resultado avaliativo: índice corporal aprovado.")
+        : "Resultado somente informativo até 2030; não altera a aprovação.";
+      return `<article class="result-card">
+        <div class="result-top">
+          <div><h3 class="result-name">Avaliação corporal · RCE</h3><p class="result-meta">${body.waist.toLocaleString("pt-BR")} cm ÷ ${body.height.toLocaleString("pt-BR")} cm = ${body.value.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })}</p></div>
+          <div class="score ${rceClass(body.classification)}">${body.classification}</div>
+        </div>
+        <p class="target">${effect}</p>
+      </article>`;
+    }
+
+    function referenceTable(result) {
+      const cells = result.row.slice(2).map((value, i) => `<td>${value}</td>`).join("");
+      return `<table aria-label="Índices de ${TESTS[result.test].label}">
+        <thead><tr><th>${TESTS[result.test].label}</th>${POINTS.map(p => `<th>${p}</th>`).join("")}</tr></thead>
+        <tbody><tr><td>${rangeLabel(result.row)}</td>${cells}</tr></tbody>
+      </table>`;
+    }
+
+    function bodyReferenceTable(year) {
+      const effect = Number(year) >= 2031 ? "Avaliativo em 2031" : "Informativo até 2030";
+      return `<table aria-label="Índices da Relação Cintura-Estatura">
+        <thead><tr><th>Avaliação corporal · RCE</th><th>Índice</th><th>Aplicação</th></tr></thead>
+        <tbody>
+          <tr><td>Ideal</td><td>Abaixo de 0,5</td><td rowspan="3">${effect}</td></tr>
+          <tr><td>Satisfatório</td><td>0,5 a 0,55</td></tr>
+          <tr><td>Insatisfatório</td><td>Acima de 0,55</td></tr>
+        </tbody>
+      </table>`;
+    }
+
+    function validateForm() {
+      if (corps.value !== "other") return false;
+      const age = Number($("age").value);
+      if (!Number.isInteger(age) || age < 18 || age > 100) {
+        $("age").setCustomValidity("Informe uma idade inteira entre 18 e 100 anos.");
+      } else $("age").setCustomValidity("");
+
+      const height = Number($("height").value);
+      const waist = Number($("waist").value);
+      $("height").setCustomValidity(!Number.isFinite(height) || height < 100 || height > 250 ? "Informe uma estatura entre 100 e 250 cm." : "");
+      $("waist").setCustomValidity(!Number.isFinite(waist) || waist < 30 || waist > 300 ? "Informe uma circunferência entre 30 e 300 cm." : "");
+
+      const prefixes = ["run", "plank"];
+      if (swimType.value !== "none") prefixes.push("swim");
+      for (const prefix of prefixes) {
+        const min = $(prefix + "-min"), sec = $(prefix + "-sec");
+        const invalid = min.value === "" || sec.value === "" || Number(min.value) < 0 || Number(sec.value) < 0 || Number(sec.value) > 59;
+        sec.setCustomValidity(invalid ? "Preencha minutos e segundos (de 0 a 59)." : "");
+      }
+      return form.reportValidity();
+    }
+
+    function updateSwim() {
+      const none = swimType.value === "none";
+      $("swim-block").classList.toggle("hidden", none);
+      $("swim-min").required = !none;
+      $("swim-sec").required = !none;
+      $("swim-label").textContent = swimType.value === "swim450" ? "Natação de 450 m" : "Natação de 50 m";
+    }
+
+    function updateBodyRule() {
+      const evaluative = Number($("year").value) >= 2031;
+      $("body-rule-hint").textContent = evaluative
+        ? "Em 2031, resultado insatisfatório implica em reprovação."
+        : "Até 2030, esta classificação é somente informativa e não altera o resultado geral.";
+    }
+
+    function updateCorps() {
+      const supported = corps.value === "other";
+      const marine = corps.value === "marine";
+      $("dependent-profile").classList.toggle("hidden", !supported);
+      $("supported-fields").classList.toggle("hidden", !supported);
+      $("fn-pending").classList.toggle("hidden", !marine);
+      for (const id of ["year", "sex", "age", "swim-type", "height", "waist", "run-min", "run-sec", "plank-min", "plank-sec"]) $(id).required = supported;
+      $("swim-min").required = supported && swimType.value !== "none";
+      $("swim-sec").required = supported && swimType.value !== "none";
+      if (marine) {
+        $("empty-state").classList.remove("hidden");
+        $("calculated").classList.add("hidden");
+        $("result-subtitle").textContent = "Os índices de Fuzileiros Navais serão incluídos na próxima etapa.";
+      } else if (!supported) {
+        $("empty-state").classList.remove("hidden");
+        $("calculated").classList.add("hidden");
+        $("result-subtitle").textContent = "Selecione primeiro o corpo ou quadro do militar.";
+      } else if ($("calculated").classList.contains("hidden")) {
+        $("result-subtitle").textContent = "Notas das provas e classificação da avaliação corporal.";
+      }
+    }
+
+    swimType.addEventListener("change", updateSwim);
+    $("year").addEventListener("change", updateBodyRule);
+    corps.addEventListener("change", updateCorps);
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      if (!validateForm()) return;
+      const year = $("year").value;
+      const sex = $("sex").value;
+      const age = Number($("age").value);
+      const height = Number($("height").value);
+      const waist = Number($("waist").value);
+      const selectedTests = ["run"];
+      if (swimType.value !== "none") selectedTests.push(swimType.value);
+      selectedTests.push("plank");
+
+      const results = selectedTests.map(test => {
+        const input = test === "run" ? "run" : test === "plank" ? "plank" : "swim";
+        return scoreTest(test, sex, year, age, enteredTime(input));
+      });
+      const rceValue = waist / height;
+      const body = { height, waist, value: rceValue, classification: classifyRce(rceValue) };
+      const physicalApproved = results.every(r => r.score !== null);
+      const bodyApproved = Number(year) < 2031 || body.classification !== "Insatisfatório";
+      const approved = physicalApproved && bodyApproved;
+
+      $("profile-summary").textContent = `Outros Corpos e Quadros · ${sex === "M" ? "Masculino" : "Feminino"} · ${age} anos · ${year}`;
+      $("status-value").textContent = approved ? "Aprovado" : "Reprovado";
+      $("overall-status").classList.toggle("approved", approved);
+      $("overall-status").classList.toggle("failed", !approved);
+      $("result-list").innerHTML = results.map(resultCard).join("") + bodyResultCard(body, year);
+      $("reference-tables").innerHTML = results.map(referenceTable).join("") + bodyReferenceTable(year);
+      if (!physicalApproved) {
+        $("result-subtitle").textContent = "Reprovado: há pelo menos uma prova com nota abaixo de 50 pontos.";
+      } else if (!bodyApproved) {
+        $("result-subtitle").textContent = "Reprovado: a RCE está insatisfatória e é avaliativa em 2031.";
+      } else if (Number(year) < 2031) {
+        $("result-subtitle").textContent = `Todas as ${results.length} provas atingiram pelo menos 50 pontos; a RCE é informativa.`;
+      } else {
+        $("result-subtitle").textContent = `Todas as ${results.length} provas e a avaliação corporal atingiram os índices exigidos.`;
+      }
+      $("empty-state").classList.add("hidden");
+      $("calculated").classList.remove("hidden");
+
+      if (window.innerWidth <= 820) $("result-title").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    form.addEventListener("reset", () => {
+      setTimeout(() => {
+        updateSwim();
+        updateBodyRule();
+        updateCorps();
+        $("empty-state").classList.remove("hidden");
+        $("calculated").classList.add("hidden");
+        $("result-subtitle").textContent = "Notas das provas e classificação da avaliação corporal.";
+      }, 0);
+    });
+
+    updateSwim();
+    updateBodyRule();
+    updateCorps();
+  </script>
+</body>
+</html>

@@ -317,7 +317,7 @@
               <label for="age">Idade na data do teste</label>
               <input id="age" type="number" min="18" max="100" step="1" placeholder="Ex.: 32" inputmode="numeric" required>
             </div>
-            <div class="field">
+            <div class="field" id="other-swim-profile">
               <label for="swim-type">Prova de natação</label>
               <select id="swim-type">
                 <option value="swim50">50 metros</option>
@@ -327,11 +327,7 @@
             </div>
           </div>
 
-          <div id="fn-pending" class="branch-note hidden">
-            Os índices das provas e da avaliação corporal de Fuzileiros Navais serão incluídos na próxima etapa. Nenhum resultado é calculado com as tabelas de Outros Corpos e Quadros.
-          </div>
-
-          <div id="supported-fields">
+          <div id="other-fields">
           <div class="test-block" id="body-block">
             <p class="section-label">Avaliação corporal</p>
             <div class="form-grid">
@@ -383,6 +379,88 @@
             <button type="reset" class="secondary">Limpar</button>
           </div>
           </div>
+
+          <div id="fn-fields" class="hidden">
+            <div class="test-block">
+              <p class="section-label">Avaliação corporal do FN</p>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="fn-height">Estatura</label>
+                  <div class="unit"><input id="fn-height" type="number" min="100" max="250" step="0.1" placeholder="Ex.: 175" inputmode="decimal"><span>cm</span></div>
+                </div>
+                <div class="field">
+                  <label for="fn-weight">Massa corporal</label>
+                  <div class="unit"><input id="fn-weight" type="number" min="30" max="300" step="0.1" placeholder="Ex.: 78" inputmode="decimal"><span>kg</span></div>
+                </div>
+                <div class="field full">
+                  <label for="fn-waist">Perímetro da cintura</label>
+                  <div class="unit"><input id="fn-waist" type="number" min="30" max="300" step="0.1" placeholder="Ex.: 84" inputmode="decimal"><span>cm</span></div>
+                </div>
+              </div>
+              <div class="body-formula">IMC = massa ÷ estatura² · Nota corporal = pontos do IMC + ajuste da cintura (máximo 100)</div>
+              <p class="hint">A nota corporal mínima suficiente é 70 pontos.</p>
+            </div>
+
+            <div class="test-block">
+              <p class="section-label">Modalidade aquática</p>
+              <div class="field full">
+                <label for="fn-water-type">Tipo de prova</label>
+                <select id="fn-water-type">
+                  <option value="fn-swim">Natação de 100 m</option>
+                  <option value="fn-water-stay">Permanência na água</option>
+                </select>
+              </div>
+              <div class="time-row" data-time="fn-water">
+                <div class="unit"><label for="fn-water-min">Minutos</label><input id="fn-water-min" type="number" min="0" max="59" step="1" placeholder="02" inputmode="numeric"><span>min</span></div>
+                <div class="time-separator">:</div>
+                <div class="unit"><label for="fn-water-sec">Segundos</label><input id="fn-water-sec" type="number" min="0" max="59" step="1" placeholder="40" inputmode="numeric"><span>s</span></div>
+              </div>
+              <p class="hint" id="fn-water-hint">Quanto menor o tempo nos 100 m, maior a pontuação.</p>
+            </div>
+
+            <div class="test-block">
+              <p class="section-label">Corrida de 3.200 m</p>
+              <div class="time-row" data-time="fn-run">
+                <div class="unit"><label for="fn-run-min">Minutos</label><input id="fn-run-min" type="number" min="0" max="59" step="1" placeholder="17" inputmode="numeric"><span>min</span></div>
+                <div class="time-separator">:</div>
+                <div class="unit"><label for="fn-run-sec">Segundos</label><input id="fn-run-sec" type="number" min="0" max="59" step="1" placeholder="00" inputmode="numeric"><span>s</span></div>
+              </div>
+              <p class="hint">Quanto menor o tempo, maior a pontuação.</p>
+            </div>
+
+            <div class="test-block">
+              <p class="section-label">Força de membros superiores</p>
+              <div class="form-grid">
+                <div class="field" id="fn-strength-choice-field">
+                  <label for="fn-strength-type">Tipo de prova</label>
+                  <select id="fn-strength-type">
+                    <option value="fn-bar">Flexão na barra</option>
+                    <option value="fn-pushup">Flexão de braços no solo (motivo de saúde)</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="fn-strength-reps">Repetições realizadas</label>
+                  <input id="fn-strength-reps" type="number" min="0" max="500" step="1" placeholder="Ex.: 8" inputmode="numeric">
+                </div>
+              </div>
+              <p class="hint" id="fn-strength-hint">Para mulheres, aplica-se a flexão de braços no solo.</p>
+            </div>
+
+            <div class="test-block">
+              <p class="section-label">Prancha isométrica</p>
+              <div class="time-row" data-time="fn-plank">
+                <div class="unit"><label for="fn-plank-min">Minutos</label><input id="fn-plank-min" type="number" min="0" max="59" step="1" placeholder="02" inputmode="numeric"><span>min</span></div>
+                <div class="time-separator">:</div>
+                <div class="unit"><label for="fn-plank-sec">Segundos</label><input id="fn-plank-sec" type="number" min="0" max="59" step="1" placeholder="30" inputmode="numeric"><span>s</span></div>
+              </div>
+              <p class="hint">Índices aplicáveis a partir do TAF ano-base 2027.</p>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="primary">Calcular resultado</button>
+              <button type="reset" class="secondary">Limpar</button>
+            </div>
+          </div>
         </form>
       </section>
 
@@ -413,7 +491,7 @@
     </div>
 
     <aside class="notice">
-      <strong>Escopo e interpretação.</strong> Índices das provas transcritos do Anexo P e RCE baseada na Equação 9 e na Tabela 6-3 da CGCFN-108, Revisão 2. Para Outros Corpos e Quadros, a RCE é informativa até 2030 e passa a compor o resultado em 2031. Desempenho abaixo de 50 em qualquer prova ou RCE insatisfatória a partir de 2031 implica em reprovação. Os índices de Fuzileiros Navais ainda não estão incluídos. Para não deixar a idade de 50 anos sem enquadramento, o simulador a inclui na última faixa, grafada como “&gt;50” no PDF.
+      <strong>Escopo e interpretação.</strong> Para Outros Corpos e Quadros, foram usados o Anexo P, a Equação 9 e a Tabela 6-3. Para Fuzileiros Navais, foram usadas as tabelas do inciso 5.5.2 e as Tabelas 6-1 e 6-2 da CGCFN-108, Revisão 2. Desempenho abaixo de 50 em qualquer prova implica em reprovação; para FN, a avaliação corporal deve atingir 70 pontos. O percentual de gordura não foi incluído porque o PDF fornecido não contém a tabela classificatória mencionada no texto. Para não deixar a idade de 50 anos sem enquadramento, o simulador a inclui na última faixa, grafada como “&gt;50” no PDF.
     </aside>
   </main>
 
@@ -574,11 +652,83 @@
       }
     };
 
+    const FN_DATA = {
+      swim: {
+        M: raw`18 30 03:20 03:00 02:40 02:20 02:00 01:40
+               31 40 03:30 03:10 02:50 02:30 02:10 01:50
+               41 49 03:40 03:20 03:00 02:40 02:20 02:00
+               50 999 03:50 03:30 03:10 02:50 02:30 02:10`,
+        F: raw`18 30 03:40 03:20 03:00 02:40 02:20 02:00
+               31 40 03:50 03:30 03:10 02:50 02:30 02:10
+               41 49 04:00 03:40 03:20 03:00 02:40 02:20
+               50 999 04:10 03:50 03:30 03:10 02:50 02:30`
+      },
+      run: {
+        M: raw`18 25 18:30 17:20 16:32 15:28 14:24 13:04
+               26 33 19:00 17:52 17:04 16:00 14:56 13:36
+               34 39 19:30 18:56 18:08 17:04 16:00 14:40
+               40 45 20:48 20:00 18:24 17:20 16:16 14:56
+               46 49 22:24 21:36 19:44 18:40 17:36 16:16
+               50 999 22:56 22:08 20:16 19:12 18:08 16:48`,
+        F: raw`18 25 20:30 17:36 17:04 16:32 16:00 15:12
+               26 33 21:00 19:12 18:40 17:52 17:04 16:00
+               34 39 21:30 20:16 19:44 18:56 18:08 17:04
+               40 45 23:20 22:24 21:36 20:32 19:28 18:24
+               46 49 24:32 23:44 22:56 21:52 20:48 19:44
+               50 999 26:40 25:52 24:32 23:12 21:52 20:32`
+      },
+      bar: {
+        M: raw`18 25 6 7 8 9 11 13
+               26 33 5 6 7 8 9 11
+               34 39 4 5 6 7 8 10
+               40 45 3 4 5 6 7 8
+               46 49 2 3 4 5 6 7
+               50 999 1 2 3 4 5 6`
+      },
+      pushup: {
+        M: raw`18 25 28 32 36 40 44 48
+               26 33 24 28 32 36 40 44
+               34 39 20 24 28 32 36 40
+               40 45 16 20 24 28 32 36
+               46 49 12 16 20 24 28 32
+               50 999 8 12 16 20 24 28`,
+        F: raw`18 25 24 27 30 33 36 39
+               26 33 21 24 27 30 33 36
+               34 39 15 18 21 24 27 30
+               40 45 12 15 18 21 24 27
+               46 49 9 12 15 18 21 24
+               50 999 6 9 12 15 18 21`
+      },
+      plank: {
+        M: raw`18 25 02:10 02:20 02:30 02:40 02:50 03:00
+               26 33 02:00 02:10 02:20 02:30 02:40 02:50
+               34 39 01:50 02:00 02:10 02:20 02:30 02:40
+               40 45 01:40 01:50 02:00 02:10 02:20 02:30
+               46 49 01:30 01:40 01:50 02:00 02:10 02:20
+               50 999 01:20 01:30 01:40 01:50 02:00 02:10`,
+        F: raw`18 25 01:40 01:50 02:00 02:10 02:20 02:30
+               26 33 01:30 01:40 01:50 02:00 02:10 02:20
+               34 39 01:20 01:30 01:40 01:50 02:00 02:10
+               40 45 01:10 01:20 01:30 01:40 01:50 02:00
+               46 49 01:00 01:10 01:20 01:30 01:40 01:50
+               50 999 00:50 01:00 01:10 01:20 01:30 01:40`
+      }
+    };
+
     const TESTS = {
       run: { label: "Corrida de 2.400 m", direction: "lower" },
       swim50: { label: "Natação de 50 m", direction: "lower" },
       swim450: { label: "Natação de 450 m", direction: "lower" },
       plank: { label: "Prancha isométrica", direction: "higher" }
+    };
+
+    const FN_TESTS = {
+      swim: { label: "Natação de 100 m", direction: "lower", kind: "time" },
+      waterStay: { label: "Permanência na água", direction: "higher", kind: "time" },
+      run: { label: "Corrida de 3.200 m", direction: "lower", kind: "time" },
+      bar: { label: "Flexão na barra", direction: "higher", kind: "reps" },
+      pushup: { label: "Flexão de braços no solo", direction: "higher", kind: "reps" },
+      plank: { label: "Prancha isométrica", direction: "higher", kind: "time" }
     };
 
     const $ = id => document.getElementById(id);
@@ -628,6 +778,65 @@
       const nextIndex = score === null ? 0 : POINTS.indexOf(score) + 1;
       const next = nextIndex < POINTS.length ? { points: POINTS[nextIndex], time: thresholds[nextIndex] } : null;
       return { test, score, performance, thresholds, row, period, next };
+    }
+
+    function fnAgeRow(test, sex, age) {
+      const rows = FN_DATA[test][sex];
+      return rows.find(r => age >= Number(r[0]) && age <= Number(r[1]));
+    }
+
+    function scoreFnTest(test, sex, age, performance) {
+      if (test === "waterStay") {
+        const score = performance >= 600 ? 50 : null;
+        return { test, score, performance, thresholds: [600], row: [18, 999, "10:00"], next: null };
+      }
+      const spec = FN_TESTS[test];
+      const row = fnAgeRow(test, sex, age);
+      const thresholds = row.slice(2).map(value => spec.kind === "time" ? seconds(value) : Number(value));
+      let score = null;
+      for (let i = POINTS.length - 1; i >= 0; i--) {
+        const passed = spec.direction === "lower" ? performance <= thresholds[i] : performance >= thresholds[i];
+        if (passed) { score = POINTS[i]; break; }
+      }
+      const nextIndex = score === null ? 0 : POINTS.indexOf(score) + 1;
+      const next = nextIndex < POINTS.length ? { points: POINTS[nextIndex], value: thresholds[nextIndex] } : null;
+      return { test, score, performance, thresholds, row, next };
+    }
+
+    function calculateFnBody(sex, heightCm, weightKg, waistCm) {
+      const bmiRaw = weightKg / ((heightCm / 100) ** 2);
+      const bmi = Math.round((bmiRaw + Number.EPSILON) * 10) / 10;
+      let classification, category, bmiPoints;
+      if (bmi <= 16) { classification = "Magreza severa"; category = "severe"; bmiPoints = 50; }
+      else if (bmi <= 16.4) { classification = "Magreza moderada"; category = "moderate"; bmiPoints = 60; }
+      else if (bmi <= 16.9) { classification = "Magreza moderada"; category = "moderate"; bmiPoints = 70; }
+      else if (bmi <= 17.6) { classification = "Magreza leve"; category = "light"; bmiPoints = 80; }
+      else if (bmi <= 18.4) { classification = "Magreza leve"; category = "light"; bmiPoints = 90; }
+      else if (bmi <= 24.9) { classification = "Normal"; category = "normal"; bmiPoints = 100; }
+      else if (bmi <= 27.4) { classification = "Sobrepeso"; category = "overweight"; bmiPoints = 90; }
+      else if (bmi <= 29.9) { classification = "Sobrepeso"; category = "overweight"; bmiPoints = 80; }
+      else if (bmi <= 34.9) { classification = "Obesidade grau I"; category = "obesity1"; bmiPoints = 70; }
+      else if (bmi <= 39.9) { classification = "Obesidade grau II"; category = "obesity23"; bmiPoints = 60; }
+      else { classification = "Obesidade grau III"; category = "obesity23"; bmiPoints = 50; }
+
+      const waist = Math.round(waistCm);
+      let waistPoints = 0, waistApplicable = true;
+      if (category === "severe" || category === "moderate") {
+        waistApplicable = false;
+      } else if (category === "light" || category === "normal") {
+        waistPoints = waist >= (sex === "M" ? 90 : 80) ? -10 : 0;
+      } else {
+        const limits = sex === "M"
+          ? (category === "overweight" ? [100, 90, 80] : category === "obesity1" ? [110, 99, 88, 77] : [125, 113, 101, 89])
+          : (category === "overweight" ? [90, 81, 72] : category === "obesity1" ? [105, 95, 85, 75] : [115, 104, 93, 82]);
+        if (waist >= limits[0]) waistPoints = -10;
+        else if (waist >= limits[1]) waistPoints = 0;
+        else if (waist >= limits[2]) waistPoints = 10;
+        else if (limits.length === 3 || waist >= limits[3]) waistPoints = 20;
+        else waistPoints = 30;
+      }
+      const finalPoints = Math.min(100, bmiPoints + waistPoints);
+      return { heightCm, weightKg, waistCm, waist, bmiRaw, bmi, classification, category, bmiPoints, waistPoints, waistApplicable, finalPoints, sufficient: finalPoints >= 70 };
     }
 
     function rangeLabel(row) {
@@ -691,6 +900,43 @@
       </article>`;
     }
 
+    function fnResultCard(result) {
+      const spec = FN_TESTS[result.test];
+      const valueText = spec.kind === "time" ? displayTime(result.performance) : `${result.performance} repetições`;
+      const scoreText = result.score === null ? "&lt; 50" : result.score;
+      let target;
+      if (result.test === "waterStay") {
+        target = result.score === null ? "Para 50 pontos: permanecer por pelo menos 10:00." : "Índice único de 50 pontos atingido.";
+      } else if (!result.next) {
+        target = "Pontuação máxima da tabela atingida.";
+      } else {
+        const nextValue = spec.kind === "time" ? displayTime(result.next.value) : `${result.next.value} repetições`;
+        const verb = spec.direction === "lower" ? "concluir em" : "atingir";
+        target = `Para <strong>${result.next.points} pontos</strong>: ${verb} ${nextValue}.`;
+      }
+      return `<article class="result-card">
+        <div class="result-top">
+          <div><h3 class="result-name">${spec.label}</h3><p class="result-meta">Resultado informado: ${valueText}${result.test === "waterStay" ? "" : ` · ${rangeLabel(result.row)}`}</p></div>
+          <div class="score ${scoreClass(result.score)}">${scoreText}</div>
+        </div>
+        <p class="target">${target}</p>
+      </article>`;
+    }
+
+    function fnBodyResultCard(body) {
+      const waistText = body.waistPoints > 0 ? `+${body.waistPoints}` : body.waistPoints;
+      const applicability = body.waistApplicable
+        ? `Ajuste da cintura (${body.waist} cm): ${waistText} pontos.`
+        : "A Tabela 6-2 não apresenta coluna para magreza severa/moderada; foi aplicado ajuste 0.";
+      return `<article class="result-card">
+        <div class="result-top">
+          <div><h3 class="result-name">Avaliação corporal do FN</h3><p class="result-meta">IMC ${body.bmi.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} · ${body.classification} · ${body.bmiPoints} pontos</p></div>
+          <div class="score ${body.sufficient ? "good" : "bad"}">${body.finalPoints} pts</div>
+        </div>
+        <p class="target">${applicability} Nota corporal final: <strong>${body.finalPoints}</strong> — ${body.sufficient ? "suficiente" : "insuficiente"}.</p>
+      </article>`;
+    }
+
     function referenceTable(result) {
       const cells = result.row.slice(2).map((value, i) => `<td>${value}</td>`).join("");
       return `<table aria-label="Índices de ${TESTS[result.test].label}">
@@ -711,20 +957,52 @@
       </table>`;
     }
 
+    function fnReferenceTable(result) {
+      if (result.test === "waterStay") {
+        return `<table aria-label="Índice de permanência na água"><thead><tr><th>Permanência na água</th><th>50 pontos</th></tr></thead><tbody><tr><td>Todas as faixas</td><td>10:00</td></tr></tbody></table>`;
+      }
+      const spec = FN_TESTS[result.test];
+      const cells = result.row.slice(2).map(value => `<td>${value}</td>`).join("");
+      return `<table aria-label="Índices de ${spec.label}">
+        <thead><tr><th>${spec.label}</th>${POINTS.map(p => `<th>${p}</th>`).join("")}</tr></thead>
+        <tbody><tr><td>${rangeLabel(result.row)}</td>${cells}</tr></tbody>
+      </table>`;
+    }
+
+    function fnBodyReferenceTable(body) {
+      return `<table aria-label="Cálculo da avaliação corporal do FN">
+        <thead><tr><th>Avaliação corporal do FN</th><th>Valor</th><th>Pontos</th></tr></thead>
+        <tbody>
+          <tr><td>IMC · ${body.classification}</td><td>${body.bmi.toLocaleString("pt-BR", { minimumFractionDigits: 1 })}</td><td>${body.bmiPoints}</td></tr>
+          <tr><td>Perímetro da cintura</td><td>${body.waist} cm</td><td>${body.waistPoints > 0 ? "+" : ""}${body.waistPoints}</td></tr>
+          <tr><td>Nota final (máximo 100)</td><td colspan="2"><strong>${body.finalPoints} · ${body.sufficient ? "Suficiente" : "Insuficiente"}</strong></td></tr>
+        </tbody>
+      </table>`;
+    }
+
     function validateForm() {
-      if (corps.value !== "other") return false;
+      if (!corps.value) return false;
       const age = Number($("age").value);
       if (!Number.isInteger(age) || age < 18 || age > 100) {
         $("age").setCustomValidity("Informe uma idade inteira entre 18 e 100 anos.");
       } else $("age").setCustomValidity("");
 
-      const height = Number($("height").value);
-      const waist = Number($("waist").value);
-      $("height").setCustomValidity(!Number.isFinite(height) || height < 100 || height > 250 ? "Informe uma estatura entre 100 e 250 cm." : "");
-      $("waist").setCustomValidity(!Number.isFinite(waist) || waist < 30 || waist > 300 ? "Informe uma circunferência entre 30 e 300 cm." : "");
+      const marine = corps.value === "marine";
+      const heightId = marine ? "fn-height" : "height";
+      const waistId = marine ? "fn-waist" : "waist";
+      const height = Number($(heightId).value);
+      const waist = Number($(waistId).value);
+      $(heightId).setCustomValidity(!Number.isFinite(height) || height < 100 || height > 250 ? "Informe uma estatura entre 100 e 250 cm." : "");
+      $(waistId).setCustomValidity(!Number.isFinite(waist) || waist < 30 || waist > 300 ? "Informe uma circunferência entre 30 e 300 cm." : "");
+      if (marine) {
+        const weight = Number($("fn-weight").value);
+        const reps = Number($("fn-strength-reps").value);
+        $("fn-weight").setCustomValidity(!Number.isFinite(weight) || weight < 30 || weight > 300 ? "Informe uma massa corporal entre 30 e 300 kg." : "");
+        $("fn-strength-reps").setCustomValidity(!Number.isInteger(reps) || reps < 0 ? "Informe um número inteiro de repetições." : "");
+      }
 
-      const prefixes = ["run", "plank"];
-      if (swimType.value !== "none") prefixes.push("swim");
+      const prefixes = marine ? ["fn-water", "fn-run", "fn-plank"] : ["run", "plank"];
+      if (!marine && swimType.value !== "none") prefixes.push("swim");
       for (const prefix of prefixes) {
         const min = $(prefix + "-min"), sec = $(prefix + "-sec");
         const invalid = min.value === "" || sec.value === "" || Number(min.value) < 0 || Number(sec.value) < 0 || Number(sec.value) > 59;
@@ -736,9 +1014,26 @@
     function updateSwim() {
       const none = swimType.value === "none";
       $("swim-block").classList.toggle("hidden", none);
-      $("swim-min").required = !none;
-      $("swim-sec").required = !none;
+      $("swim-min").required = corps.value === "other" && !none;
+      $("swim-sec").required = corps.value === "other" && !none;
       $("swim-label").textContent = swimType.value === "swim450" ? "Natação de 450 m" : "Natação de 50 m";
+    }
+
+    function updateFnWater() {
+      const staying = $("fn-water-type").value === "fn-water-stay";
+      $("fn-water-hint").textContent = staying
+        ? "São atribuídos 50 pontos para permanência de pelo menos 10 minutos."
+        : "Quanto menor o tempo nos 100 m, maior a pontuação.";
+    }
+
+    function updateFnStrength() {
+      const female = $("sex").value === "F";
+      $("fn-strength-choice-field").classList.toggle("hidden", female);
+      $("fn-strength-type").disabled = female;
+      if (female) $("fn-strength-type").value = "fn-pushup";
+      $("fn-strength-hint").textContent = female
+        ? "Para mulheres, aplica-se a flexão de braços no solo."
+        : "A flexão no solo substitui a barra apenas por motivo de saúde.";
     }
 
     function updateBodyRule() {
@@ -749,28 +1044,35 @@
     }
 
     function updateCorps() {
-      const supported = corps.value === "other";
+      const other = corps.value === "other";
       const marine = corps.value === "marine";
-      $("dependent-profile").classList.toggle("hidden", !supported);
-      $("supported-fields").classList.toggle("hidden", !supported);
-      $("fn-pending").classList.toggle("hidden", !marine);
-      for (const id of ["year", "sex", "age", "swim-type", "height", "waist", "run-min", "run-sec", "plank-min", "plank-sec"]) $(id).required = supported;
-      $("swim-min").required = supported && swimType.value !== "none";
-      $("swim-sec").required = supported && swimType.value !== "none";
+      const selected = other || marine;
+      $("dependent-profile").classList.toggle("hidden", !selected);
+      $("other-swim-profile").classList.toggle("hidden", !other);
+      $("other-fields").classList.toggle("hidden", !other);
+      $("fn-fields").classList.toggle("hidden", !marine);
+      for (const id of ["year", "sex", "age"]) $(id).required = selected;
+      for (const id of ["swim-type", "height", "waist", "run-min", "run-sec", "plank-min", "plank-sec"]) $(id).required = other;
+      for (const id of ["fn-height", "fn-weight", "fn-waist", "fn-water-type", "fn-water-min", "fn-water-sec", "fn-run-min", "fn-run-sec", "fn-strength-reps", "fn-plank-min", "fn-plank-sec"]) $(id).required = marine;
+      $("swim-min").required = other && swimType.value !== "none";
+      $("swim-sec").required = other && swimType.value !== "none";
       if (marine) {
-        $("empty-state").classList.remove("hidden");
-        $("calculated").classList.add("hidden");
-        $("result-subtitle").textContent = "Os índices de Fuzileiros Navais serão incluídos na próxima etapa.";
-      } else if (!supported) {
+        if ($("calculated").classList.contains("hidden")) $("result-subtitle").textContent = "Notas das provas específicas e avaliação corporal do Fuzileiro Naval.";
+      } else if (!other) {
         $("empty-state").classList.remove("hidden");
         $("calculated").classList.add("hidden");
         $("result-subtitle").textContent = "Selecione primeiro o corpo ou quadro do militar.";
       } else if ($("calculated").classList.contains("hidden")) {
         $("result-subtitle").textContent = "Notas das provas e classificação da avaliação corporal.";
       }
+      updateSwim();
+      updateFnStrength();
     }
 
     swimType.addEventListener("change", updateSwim);
+    $("fn-water-type").addEventListener("change", updateFnWater);
+    $("fn-strength-type").addEventListener("change", updateFnStrength);
+    $("sex").addEventListener("change", updateFnStrength);
     $("year").addEventListener("change", updateBodyRule);
     corps.addEventListener("change", updateCorps);
 
@@ -780,6 +1082,37 @@
       const year = $("year").value;
       const sex = $("sex").value;
       const age = Number($("age").value);
+      if (corps.value === "marine") {
+        const height = Number($("fn-height").value);
+        const weight = Number($("fn-weight").value);
+        const waist = Number($("fn-waist").value);
+        const waterTest = $("fn-water-type").value === "fn-water-stay" ? "waterStay" : "swim";
+        const strengthTest = sex === "F" || $("fn-strength-type").value === "fn-pushup" ? "pushup" : "bar";
+        const results = [
+          scoreFnTest(waterTest, sex, age, enteredTime("fn-water")),
+          scoreFnTest("run", sex, age, enteredTime("fn-run")),
+          scoreFnTest(strengthTest, sex, age, Number($("fn-strength-reps").value)),
+          scoreFnTest("plank", sex, age, enteredTime("fn-plank"))
+        ];
+        const body = calculateFnBody(sex, height, weight, waist);
+        const physicalApproved = results.every(r => r.score !== null);
+        const approved = physicalApproved && body.sufficient;
+        $("profile-summary").textContent = `Fuzileiro Naval · ${sex === "M" ? "Masculino" : "Feminino"} · ${age} anos · ${year}`;
+        $("status-value").textContent = approved ? "Aprovado" : "Reprovado";
+        $("overall-status").classList.toggle("approved", approved);
+        $("overall-status").classList.toggle("failed", !approved);
+        $("result-list").innerHTML = results.map(fnResultCard).join("") + fnBodyResultCard(body);
+        $("reference-tables").innerHTML = results.map(fnReferenceTable).join("") + fnBodyReferenceTable(body);
+        $("result-subtitle").textContent = !physicalApproved
+          ? "Reprovado: há pelo menos uma prova com nota abaixo de 50 pontos."
+          : !body.sufficient
+            ? "Reprovado: a nota da avaliação corporal ficou abaixo de 70 pontos."
+            : "Todas as provas e a avaliação corporal atingiram os índices mínimos.";
+        $("empty-state").classList.add("hidden");
+        $("calculated").classList.remove("hidden");
+        if (window.innerWidth <= 820) $("result-title").scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
       const height = Number($("height").value);
       const waist = Number($("waist").value);
       const selectedTests = ["run"];
@@ -820,6 +1153,8 @@
     form.addEventListener("reset", () => {
       setTimeout(() => {
         updateSwim();
+        updateFnWater();
+        updateFnStrength();
         updateBodyRule();
         updateCorps();
         $("empty-state").classList.remove("hidden");
@@ -829,6 +1164,8 @@
     });
 
     updateSwim();
+    updateFnWater();
+    updateFnStrength();
     updateBodyRule();
     updateCorps();
   </script>

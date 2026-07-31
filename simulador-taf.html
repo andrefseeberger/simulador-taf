@@ -62,7 +62,7 @@
     }
 
     h1 { margin: 0; color: var(--navy); font-size: clamp(2.1rem, 5vw, 4rem); line-height: .98; letter-spacing: -.045em; }
-    .subtitle { max-width: 690px; margin: 18px 0 0; color: var(--muted); font-size: 1.04rem; }
+    .subtitle { /*max-width: 690px; */margin: 18px 0 0; color: var(--muted); font-size: 1.04rem; }
 
     .doc-tag {
       padding: 12px 16px;
@@ -527,7 +527,7 @@
     </div>
 
     <aside class="notice">
-      <strong>Escopo e interpretação.</strong> Para Outros Corpos e Quadros, foram usados o Anexo P, a Equação 9 e a Tabela 6-3. Para Fuzileiros Navais, foram usadas as tabelas do inciso 5.5.2, as Equações 4 a 8, as Tabelas 6-1 e 6-2 e o Anexo I da CGCFN-108, Revisão 2. Desempenho abaixo de 50 em qualquer prova implica em reprovação; para FN, a avaliação corporal deve atingir 70 pontos. O percentual de gordura é exclusivamente informativo. Para mulheres obesas, o resultado principal usa 0,14354 × massa; a variante 10,8336 × massa é exibida separadamente como provável erro da publicação. As lacunas do Anexo I são indicadas como “entre faixas”; nas sobreposições é adotada a classificação mais conservadora. Para não deixar a idade de 50 anos sem enquadramento, o simulador a inclui na última faixa, grafada como “&gt;50” no PDF.
+      <strong>Escopo e interpretação.</strong> Para Outros Corpos e Quadros, foram usados o Anexo P, a Equação 9 e a Tabela 6-3. Para Fuzileiros Navais, foram usadas as tabelas do inciso 5.5.2, as Equações 4 a 8, as Tabelas 6-1 e 6-2 e o Anexo I da CGCFN-108, Revisão 2. Desempenho abaixo de 50 em qualquer prova implica em reprovação; para FN, nota corporal final igual ou superior a 70 é classificada como “Suficiente”, e nota inferior a 70 como “Insuficiente”. O percentual de gordura é exclusivamente informativo e não compõe essa nota. Para mulheres obesas, o resultado principal usa 0,14354 × massa; a variante 10,8336 × massa é exibida separadamente como provável erro da publicação. As lacunas do Anexo I são indicadas como “entre faixas”; nas sobreposições é adotada a classificação mais conservadora. Para não deixar a idade de 50 anos sem enquadramento, o simulador a inclui na última faixa, grafada como “&gt;50” no PDF.
     </aside>
   </main>
 
@@ -1021,7 +1021,7 @@
       return `<article class="result-card">
         <div class="result-top">
           <div><h3 class="result-name">Avaliação corporal do FN</h3><p class="result-meta">IMC ${body.bmi.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} · ${body.classification} · ${body.bmiPoints} pontos</p></div>
-          <div class="score ${body.sufficient ? "good" : "bad"}">${body.finalPoints} pts</div>
+          <div class="score ${body.sufficient ? "good" : "bad"}">${body.sufficient ? "Suficiente" : "Insuficiente"}</div>
         </div>
         <p class="target">${applicability} Nota corporal final: <strong>${body.finalPoints}</strong> — ${body.sufficient ? "suficiente" : "insuficiente"}.</p>
       </article>`;
